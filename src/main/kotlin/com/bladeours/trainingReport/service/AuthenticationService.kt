@@ -42,11 +42,12 @@ class AuthenticationService(
         val extractedEmail = tokenService.extractEmail(refreshToken)
         return extractedEmail?.let { email ->
             val currentUserDetails = userDetailsService.loadUserByUsername(email)
-            val refreshTokenUserDetails = refreshTokenRepository.findUserDetailsByToken(refreshToken)
-            if (!tokenService.isExpired(refreshToken) && refreshTokenUserDetails?.username == currentUserDetails.username)
+            val refreshTokenUserDetails =
+                refreshTokenRepository.findUserDetailsByToken(refreshToken)
+            if (!tokenService.isExpired(refreshToken) &&
+                refreshTokenUserDetails?.username == currentUserDetails.username)
                 tokenService.generateAccessToken(currentUserDetails)
-            else
-                null
+            else null
         }
     }
 
@@ -64,10 +65,5 @@ class AuthenticationService(
             password = encoder.encode(this.password),
             firstName = this.firstName,
             lastName = this.lastName,
-            role = SimpleGrantedAuthority("USER")
-        )
+            role = SimpleGrantedAuthority("USER"))
 }
-
-
-
-

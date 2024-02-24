@@ -5,10 +5,13 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.4"
 	kotlin("jvm") version "1.9.22"
 	kotlin("plugin.spring") version "1.9.22"
+	id("com.diffplug.spotless") version "6.25.0"
 }
 
+
+
 group = "com.bladeours"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 java {
 }
@@ -43,4 +46,12 @@ tasks.withType<Test> {
 }
 kotlin {
 	jvmToolchain(21)
+}
+
+//spotless { // if you are using build.gradle.kts, instead of 'spotless {' use:
+ configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+	 kotlin {
+		 // version, editorConfigPath, editorConfigOverride and customRuleSets are all optional
+		 ktfmt().dropboxStyle()
+	 }
 }
