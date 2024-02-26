@@ -1,7 +1,9 @@
 package com.bladeours.trainingReport.config
 
-import com.bladeours.trainingReport.repository.UserRepository
-import com.bladeours.trainingReport.service.CustomUserDetailsService
+import com.bladeours.trainingReport.auth.service.CustomUserDetailsService
+import com.bladeours.trainingReport.auth.service.repository.UserRepository
+import io.github.oshai.kotlinlogging.KLogger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -21,18 +23,18 @@ class Configuration {
     fun userDetailsService(userRepository: UserRepository): UserDetailsService =
         CustomUserDetailsService(userRepository)
 
-    @Bean
-    fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
+    @Bean fun encoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
     fun authenticationProvider(userRepository: UserRepository): AuthenticationProvider =
-        DaoAuthenticationProvider()
-            .also {
-                it.setUserDetailsService(userDetailsService(userRepository))
-                it.setPasswordEncoder(encoder())
-            }
+        DaoAuthenticationProvider().also {
+            it.setUserDetailsService(userDetailsService(userRepository))
+            it.setPasswordEncoder(encoder())
+        }
 
     @Bean
     fun authenticationManager(config: AuthenticationConfiguration): AuthenticationManager =
         config.authenticationManager
+
+    @Bean fun logger(): KLogger = KotlinLogging.logger {}
 }

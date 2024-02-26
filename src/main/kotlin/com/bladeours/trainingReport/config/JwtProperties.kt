@@ -3,8 +3,9 @@ package com.bladeours.trainingReport.config
 import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("jwt")
-data class JwtProperties (
+data class JwtProperties(
     val key: String,
     val accessTokenExpiration: Long,
-    val refreshTokenExpiration: Long
+    val refreshTokenExpiration: Long,
+    val refreshTokenCookie: String
 )

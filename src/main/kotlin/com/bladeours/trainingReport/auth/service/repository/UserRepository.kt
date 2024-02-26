@@ -1,4 +1,4 @@
-package com.bladeours.trainingReport.repository
+package com.bladeours.trainingReport.auth.service.repository
 
 import com.bladeours.trainingReport.model.User
 import org.springframework.data.mongodb.repository.MongoRepository

@@ -1,4 +1,4 @@
-package com.bladeours.trainingReport.model.request
+package com.bladeours.trainingReport.auth.model.request
 
 data class RegisterRequest(
     val email: String,

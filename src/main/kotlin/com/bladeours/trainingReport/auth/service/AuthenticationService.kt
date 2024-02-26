@@ -1,11 +1,12 @@
-package com.bladeours.trainingReport.service
+package com.bladeours.trainingReport.auth.service
 
+import com.bladeours.trainingReport.auth.model.request.AuthenticationRequest
+import com.bladeours.trainingReport.auth.model.request.RegisterRequest
+import com.bladeours.trainingReport.auth.model.response.TokenResponse
+import com.bladeours.trainingReport.auth.service.repository.UserRepository
+import com.bladeours.trainingReport.exception.AppException
 import com.bladeours.trainingReport.model.User
-import com.bladeours.trainingReport.model.request.AuthenticationRequest
-import com.bladeours.trainingReport.model.request.RegisterRequest
-import com.bladeours.trainingReport.model.response.AuthenticationResponse
-import com.bladeours.trainingReport.repository.RefreshTokenRepository
-import com.bladeours.trainingReport.repository.UserRepository
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -17,43 +18,27 @@ class AuthenticationService(
     private val authManager: AuthenticationManager,
     private val userDetailsService: CustomUserDetailsService,
     private val tokenService: TokenService,
-    private val refreshTokenRepository: RefreshTokenRepository,
     private val userRepository: UserRepository,
     private val encoder: PasswordEncoder
 ) {
-    fun authentication(authenticationRequest: AuthenticationRequest): AuthenticationResponse {
+    fun authentication(authenticationRequest: AuthenticationRequest): TokenResponse {
         authenticate(authenticationRequest.email, authenticationRequest.password)
         return createAuthResponse(authenticationRequest.email)
     }
 
-    private fun createAuthResponse(email: String): AuthenticationResponse {
+    private fun createAuthResponse(email: String): TokenResponse {
         val user = userDetailsService.loadUserByUsername(email)
         val accessToken = tokenService.generateAccessToken(user)
-        val refreshToken = tokenService.generateRefreshToken(user)
-        refreshTokenRepository.save(refreshToken, user)
-        return AuthenticationResponse(accessToken, refreshToken)
+        return TokenResponse(accessToken)
     }
 
     private fun authenticate(email: String, password: String) {
         authManager.authenticate(UsernamePasswordAuthenticationToken(email, password))
     }
 
-    fun refreshAccessToken(refreshToken: String): String? {
-        val extractedEmail = tokenService.extractEmail(refreshToken)
-        return extractedEmail?.let { email ->
-            val currentUserDetails = userDetailsService.loadUserByUsername(email)
-            val refreshTokenUserDetails =
-                refreshTokenRepository.findUserDetailsByToken(refreshToken)
-            if (!tokenService.isExpired(refreshToken) &&
-                refreshTokenUserDetails?.username == currentUserDetails.username)
-                tokenService.generateAccessToken(currentUserDetails)
-            else null
-        }
-    }
-
-    fun register(registerRequest: RegisterRequest): AuthenticationResponse {
+    fun register(registerRequest: RegisterRequest): TokenResponse {
         if (userRepository.findByEmail(registerRequest.email) != null) {
-            throw IllegalStateException("User already exists")
+            throw AppException("User already exists", HttpStatus.CONFLICT)
         }
         userRepository.insert(registerRequest.toUser())
         return createAuthResponse(registerRequest.email)
@@ -65,5 +50,6 @@ class AuthenticationService(
             password = encoder.encode(this.password),
             firstName = this.firstName,
             lastName = this.lastName,
+            refreshToken = "",
             role = SimpleGrantedAuthority("USER"))
 }

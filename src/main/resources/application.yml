@@ -2,6 +2,7 @@ jwt:
   key: 45k3kofmweaofaetogetyeeahaehksdfgnp;4o0p-ttgk09r034g3k4gbosfk0320
   access-token-expiration: 3600000
   refresh-token-expiration: 86400000
+  refresh-token-cookie: refreshToken
 spring:
   data:
     mongodb:

@@ -32,6 +32,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.12.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+	implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
 }
 
 tasks.withType<KotlinCompile> {
