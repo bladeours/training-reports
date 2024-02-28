@@ -12,9 +12,10 @@ class UserService(private val userRepository: UserRepository) {
     fun getLoggedUser(): User {
         val auth =
             SecurityContextHolder.getContext().authentication
-                ?: throw AppException("can not find user", HttpStatus.NOT_FOUND)
-        return userRepository.findByEmail(auth.name)
-            ?: throw AppException("can not find user", HttpStatus.NOT_FOUND)
+                ?: throw AppException("user is not logged in", HttpStatus.NOT_FOUND)
+        return userRepository.findByEmail(auth.name).orElseThrow {
+            throw AppException("can not find user", HttpStatus.NOT_FOUND)
+        }
     }
 
     fun updateRefreshToken(refreshToken: String) {

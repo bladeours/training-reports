@@ -34,6 +34,9 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 	implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+	testImplementation("org.testcontainers:mongodb:1.19.6")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
 
 }
 

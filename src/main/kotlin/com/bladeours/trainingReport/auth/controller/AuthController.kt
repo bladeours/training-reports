@@ -21,7 +21,7 @@ class AuthController(
 ) {
     @PostMapping("/login")
     fun authenticate(@RequestBody authRequest: AuthenticationRequest): TokenResponse {
-        val token = authenticationService.authentication(authRequest)
+        val token = authenticationService.login(authRequest)
         addCookieWithRefreshTokenToResponse()
         return token
     }

@@ -22,9 +22,13 @@ class TokenServiceTest {
     @Test
     fun `should generate access token`() {
         // given
-        val jwtProperties = JwtProperties("45k3kofmweaofaetogetyeeahaehksdfgnp;4o0p-ttgk09r034g3k4gbosfk0320", 1000, 1000, "cookie")
-        val userService = mock<UserService>()
-        {on { getLoggedUser() } doReturn user}
+        val jwtProperties =
+            JwtProperties(
+                "45k3kofmweaofaetogetyeeahaehksdfgnp;4o0p-ttgk09r034g3k4gbosfk0320",
+                1000,
+                1000,
+                "cookie")
+        val userService = mock<UserService>() { on { getLoggedUser() } doReturn user }
         val tokenService = TokenService(jwtProperties, userService)
         // when
         val accessToken = tokenService.generateAccessToken(user)

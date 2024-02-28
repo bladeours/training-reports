@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
+import java.util.*
 
 class AuthenticationServiceTest {
 
@@ -38,7 +39,7 @@ class AuthenticationServiceTest {
                 authManagerMock, userDetailsServiceMock, tokenService, mock(), mock())
         val authRequest = AuthenticationRequest("email", "password")
         // when
-        authenticationService.authentication(authRequest)
+        authenticationService.login(authRequest)
         // then
         verify(authManagerMock)
             .authenticate(
@@ -57,7 +58,7 @@ class AuthenticationServiceTest {
                 authManagerMock, userDetailsServiceMock, tokenService, mock(), mock())
         val authRequest = AuthenticationRequest("email", "password")
         // when
-        val response = authenticationService.authentication(authRequest)
+        val response = authenticationService.login(authRequest)
         // then
         assertThat(response.token).isEqualTo("token")
     }
@@ -70,7 +71,7 @@ class AuthenticationServiceTest {
         val tokenService = mock<TokenService>()
         val registerRequest = RegisterRequest("email", "", "", "")
         val userRepoMock =
-            mock<UserRepository> { on { findByEmail(registerRequest.email) } doReturn user }
+            mock<UserRepository> { on { findByEmail(registerRequest.email) } doReturn Optional.of(user) }
         val authenticationService =
             AuthenticationService(
                 authManagerMock, userDetailsServiceMock, tokenService, userRepoMock, mock())
@@ -82,9 +83,9 @@ class AuthenticationServiceTest {
     fun `register() should insert user with encoded password to database`() {
         // given
         val registerRequest = RegisterRequest("email", "password", "", "")
-        val userRepoMock = mock<UserRepository>() { on { findByEmail(any()) } doReturn null }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.empty() }
         val userDetailsService =
-            mock<CustomUserDetailsService>() { on { loadUserByUsername(any()) } doReturn user }
+            mock<CustomUserDetailsService> { on { loadUserByUsername(any()) } doReturn user }
         val passwordEncoder =
             mock<PasswordEncoder> { on { encode(any()) } doReturn ("encodedPassword") }
         val tokenService =

@@ -9,6 +9,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import java.util.Optional
 
 class CustomUserDetailsServiceTest {
     private val user =
@@ -23,7 +24,7 @@ class CustomUserDetailsServiceTest {
     @Test
     fun `should throw AppException when can not find user`() {
         // given
-        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn null }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.empty() }
         val customUserDetailsService = CustomUserDetailsService(userRepoMock)
 
         // when then
@@ -33,7 +34,7 @@ class CustomUserDetailsServiceTest {
     @Test
     fun `should return user if is in database`() {
         // given
-        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn user }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.of(user) }
         val customUserDetailsService = CustomUserDetailsService(userRepoMock)
         // when
         val actualUser = customUserDetailsService.loadUserByUsername("")

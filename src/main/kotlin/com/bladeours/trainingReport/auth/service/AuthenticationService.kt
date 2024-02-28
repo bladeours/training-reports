@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -21,7 +22,7 @@ class AuthenticationService(
     private val userRepository: UserRepository,
     private val encoder: PasswordEncoder
 ) {
-    fun authentication(authenticationRequest: AuthenticationRequest): TokenResponse {
+    fun login(authenticationRequest: AuthenticationRequest): TokenResponse {
         authenticate(authenticationRequest.email, authenticationRequest.password)
         return createAuthResponse(authenticationRequest.email)
     }
@@ -33,14 +34,16 @@ class AuthenticationService(
     }
 
     private fun authenticate(email: String, password: String) {
-        authManager.authenticate(UsernamePasswordAuthenticationToken(email, password))
+        val auth = authManager.authenticate(UsernamePasswordAuthenticationToken(email, password))
+        SecurityContextHolder.getContext().authentication = auth
     }
 
     fun register(registerRequest: RegisterRequest): TokenResponse {
-        if (userRepository.findByEmail(registerRequest.email) != null) {
+        userRepository.findByEmail(registerRequest.email).ifPresent {
             throw AppException("User already exists", HttpStatus.CONFLICT)
         }
         userRepository.insert(registerRequest.toUser())
+        authenticate(registerRequest.email, registerRequest.password)
         return createAuthResponse(registerRequest.email)
     }
 

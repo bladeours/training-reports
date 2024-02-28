@@ -10,6 +10,7 @@ import org.mockito.kotlin.*
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import java.util.*
 
 class UserServiceTest {
     private val user =
@@ -24,7 +25,7 @@ class UserServiceTest {
     @Test
     fun `should get user when authentication is not null`() {
         // given
-        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn user }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.of(user) }
         val userService = UserService(userRepoMock)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken.authenticated(user, null, user.authorities)
@@ -39,7 +40,7 @@ class UserServiceTest {
     @Test
     fun `should return AppException when can not find user`() {
         // given
-        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn null }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.empty() }
         val userService = UserService(userRepoMock)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken.authenticated(user, null, user.authorities)
@@ -61,7 +62,7 @@ class UserServiceTest {
     @Test
     fun `should update refresh token in user`() {
         // given
-        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn user }
+        val userRepoMock = mock<UserRepository> { on { findByEmail(any()) } doReturn Optional.of(user) }
         val userService = UserService(userRepoMock)
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken.authenticated(user, null, user.authorities)
